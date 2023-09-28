@@ -14,36 +14,32 @@ for filename in glob.glob('../CSV/*.csv'):
     print(filename.ljust(45), result['encoding'])
 """
 
-columnsToIgnore = []
-
-for x in range(99):
-    if x==0:
-        continue
-    else:
-        columnsToIgnore.append('Zusatz '+str(x))
+df = pd.read_csv('../CSV/export_Kunden_DE_E.csv', encoding = "utf-8", delimiter=";", encoding_errors='ignore')
 
 
-with open('../CSV/export_Kunden_DE_E.csv') as csv_file:
- 
-    # creating an object of csv reader
-    # with the delimiter as ,
-    csv_reader = csv.reader(csv_file, delimiter = ';')
- 
-    # list to store the names of columns
-    list_of_column_names = []
- 
-    # loop to iterate through the rows of csv
-    for row in csv_reader:
- 
-        # adding the first row
-        list_of_column_names.append(row)
- 
-        # breaking the loop after the
-        # first iteration itself
-        break
+def deleteZusatzColumns():
+    columnsToIgnore  = []
+    for x in range(100):
+        if x==0:
+            continue
+        else:
+            columnsToIgnore.append('Zusatz '+str(x))
+
+    for x in columnsToIgnore:
+        df.drop(x, inplace=True, axis=1)
+        #print('✔  Dropped "'+x+'"')
+    print('✔  Dropped 99 Columns')
+
+def formattierung_Anrede():
+    df['Anrede'] = df['Anrede'].str.lower()
 
 
-print(list_of_column_names[0])
 
-df = pd.read_csv('../CSV/export_Kunden_DE_E.csv', encoding = "MacRoman", delimiter=";")
-#print(df.to_string())
+
+deleteZusatzColumns()
+
+
+time.sleep(2)
+
+df.to_csv('test1.csv', sep=';', index=False, encoding='utf-8')
+print(df.head(100))
