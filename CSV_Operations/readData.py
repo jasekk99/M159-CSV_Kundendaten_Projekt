@@ -1,8 +1,6 @@
 import pandas as pd
 import os
 import time
-import chardet
-import glob
 import csv
 import numpy as np
 
@@ -23,19 +21,27 @@ def deleteZusatzColumns():
     print('✔  Dropped 99 Columns')
 
 def formattierung_Anrede():
-    df['Anrede'] = df.Anrede.str.lower()
+    df.Anrede = df.Anrede.str.lower()
 
-
+def formattierung_Titel():
+    #Titel is the name of the column and title is the name of the capitalization function in pandas
+    df.Titel = df.Titel.str.title()
 
 
 
 
 deleteZusatzColumns()
 formattierung_Anrede()
+formattierung_Titel()
 
 def formattierung_validator():
-    if df['Anrede'].str.islower().all() == True:
+    #Anrede
+    if df.Anrede.str.islower().all() == True:
         print('✔  "Anrede" is Formatted correctly')
+
+    #Titel
+    if df.Titel.str.istitle().all() == True:
+        print('✔  "Titel" is Formatted correctly')
 
 formattierung_validator()
 
