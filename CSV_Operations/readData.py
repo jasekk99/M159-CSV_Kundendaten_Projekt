@@ -1,11 +1,14 @@
 import pandas as pd
-#import os
-#import time
-#import numpy as np
+import time
 import bcolors as b
 import string
+import re
+from datetime import datetime
+import numpy as np
+
 
 df = pd.read_csv('../CSV/export_Kunden_DE_E.csv', encoding = "utf-8", delimiter=";", encoding_errors='ignore')
+
 
 columnsToIgnore  = []
 def deleteZusatzColumns():
@@ -25,24 +28,107 @@ def formattierung_Anrede():
 
 def formattierung_Titel():
     #Titel is the name of the column and title is the name of the capitalization function in pandas
+    #df.Titel = df.Titel.fillna('N/A')
     df.Titel = df.Titel.str.title()
 
 def formattierung_Vorname():
+    df['Vorname'] = df['Vorname'].str.replace(r'è', 'e', regex=True, flags=re.IGNORECASE)
+    df['Vorname'] = df['Vorname'].str.replace(r'é', 'e', regex=True, flags=re.IGNORECASE)
+    df['Vorname'] = df['Vorname'].str.replace(r'ê', 'e', regex=True, flags=re.IGNORECASE)
+    df['Vorname'] = df['Vorname'].str.replace(r'ã', 'a', regex=True, flags=re.IGNORECASE)
+    df['Vorname'] = df['Vorname'].str.replace(r'ř', 'r', regex=True, flags=re.IGNORECASE)
+    df['Vorname'] = df['Vorname'].str.replace(r'ç', 'c', regex=True, flags=re.IGNORECASE)
+    df['Vorname'] = df['Vorname'].str.replace(r'æ', 'ae', regex=True, flags=re.IGNORECASE)
+    df['Vorname'] = df['Vorname'].str.replace(r'ø', 'o', regex=True, flags=re.IGNORECASE)
+    df['Vorname'] = df['Vorname'].str.replace(r'å', 'a', regex=True, flags=re.IGNORECASE)
+    df['Vorname'] = df['Vorname'].str.replace(r'í', 'i', regex=True, flags=re.IGNORECASE)
+    df['Vorname'] = df['Vorname'].str.replace(r'ú', 'u', regex=True, flags=re.IGNORECASE)
+    df['Vorname'] = df['Vorname'].str.replace(r'ù', 'u', regex=True, flags=re.IGNORECASE)
+    df['Vorname'] = df['Vorname'].str.replace(r'û', 'u', regex=True, flags=re.IGNORECASE)
+    df['Vorname'] = df['Vorname'].str.replace(r'ğ', 'g', regex=True, flags=re.IGNORECASE)
+    df['Vorname'] = df['Vorname'].str.replace(r'ä', 'ae', regex=True, flags=re.IGNORECASE)
+    df['Vorname'] = df['Vorname'].str.replace(r'ö', 'oe', regex=True, flags=re.IGNORECASE)
+    df['Vorname'] = df['Vorname'].str.replace(r'ü', 'ue', regex=True, flags=re.IGNORECASE)
+    df['Vorname'] = df['Vorname'].str.replace(r'ß', 'ss', regex=True, flags=re.IGNORECASE)
     df.Vorname = df.Vorname.str.title()
 
+def formattierung_Nachname():
+    df['Nachname'] = df['Nachname'].str.replace(r'è', 'e', regex=True, flags=re.IGNORECASE)
+    df['Nachname'] = df['Nachname'].str.replace(r'é', 'e', regex=True, flags=re.IGNORECASE)
+    df['Nachname'] = df['Nachname'].str.replace(r'ê', 'e', regex=True, flags=re.IGNORECASE)
+    df['Nachname'] = df['Nachname'].str.replace(r'ã', 'a', regex=True, flags=re.IGNORECASE)
+    df['Nachname'] = df['Nachname'].str.replace(r'ř', 'r', regex=True, flags=re.IGNORECASE)
+    df['Nachname'] = df['Nachname'].str.replace(r'ç', 'c', regex=True, flags=re.IGNORECASE)
+    df['Nachname'] = df['Nachname'].str.replace(r'æ', 'ae', regex=True, flags=re.IGNORECASE)
+    df['Nachname'] = df['Nachname'].str.replace(r'ø', 'o', regex=True, flags=re.IGNORECASE)
+    df['Nachname'] = df['Nachname'].str.replace(r'å', 'a', regex=True, flags=re.IGNORECASE)
+    df['Nachname'] = df['Nachname'].str.replace(r'í', 'i', regex=True, flags=re.IGNORECASE)
+    df['Nachname'] = df['Nachname'].str.replace(r'ú', 'u', regex=True, flags=re.IGNORECASE)
+    df['Nachname'] = df['Nachname'].str.replace(r'ù', 'u', regex=True, flags=re.IGNORECASE)
+    df['Nachname'] = df['Nachname'].str.replace(r'û', 'u', regex=True, flags=re.IGNORECASE)
+    df['Nachname'] = df['Nachname'].str.replace(r'ğ', 'g', regex=True, flags=re.IGNORECASE)
+    df['Nachname'] = df['Nachname'].str.replace(r'ä', 'ae', regex=True, flags=re.IGNORECASE)
+    df['Nachname'] = df['Nachname'].str.replace(r'ö', 'oe', regex=True, flags=re.IGNORECASE)
+    df['Nachname'] = df['Nachname'].str.replace(r'ü', 'ue', regex=True, flags=re.IGNORECASE)
+    df['Nachname'] = df['Nachname'].str.replace(r'ß', 'ss', regex=True, flags=re.IGNORECASE)
+    df.Nachname = df.Nachname.str.title()
 
+def formattierung_Geburtsdatum():
+    def is_valid_date(date_string):
+        date_pattern = r'\d{2}-\d{2}-\d{4}'
+        match = re.match(date_pattern, date_string)
+        if match:
+            try:
+                date_obj = datetime.strptime(date_string, "%d-%m-%Y")
+                formatted_date = date_obj.strftime("%d-%m-%Y")
+                return formatted_date
+            except ValueError:
+                return date_string  # Keep if valid but with "dd-mm-yyyy" format
+        else:
+            return "Invalid Date"  # Keep as is if it doesn't match the pattern
+        # Apply the function to the DataFrame and create a new column "valid_date"
+    
+
+    #df['Geburtsdatum'] = pd.to_datetime(df['Geburtsdatum'], format="mixed", errors='ignore')
+    df['Geburtsdatum'] = df['Geburtsdatum'].str.replace('/','-')
+    df['Geburtsdatum'] = df['Geburtsdatum'].str.replace('.','-')
+    
+    # Display the rows with valid dates
+    df['Geburtsdatum'] = df['Geburtsdatum'].apply(is_valid_date)
+    date_pattern = r'\b(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])-\d{4}\b'
+    # Use boolean indexing to select rows where 'date_column' matches the pattern
+    matched_dates = df[df['Geburtsdatum'].str.match(date_pattern)]
+
+def formattierung_Strasse_Hausnummer():
+    hausnummer_liste = []
+    number_pattern = r'\d+'
+
+    for text in df['Strasse']:
+        numbers = re.findall(number_pattern, text)
+        hausnummer_liste.extend(numbers)
+    
+    df['Hausnummer'].fillna(df['Strasse'], inplace=True)
+    df['Strasse'] = df['Strasse'].str.replace('\d+', '', regex=True)
+    df['Strasse'] = df['Strasse'].str.replace('\s[a-z].* [a-z]\s', '', regex=True)
+    df.at[70, 'Strasse'] = "In der Sengenau"
+    df.at[1520, 'Strasse'] = "Marellenkämpe"
+    df.at[1689, 'Strasse'] = "Lerchensteg"
+    df['Strasse'] = df['Strasse'].str.replace(r'ß', 'ss', regex=True, flags=re.IGNORECASE)
+    df['Strasse'] = df['Strasse'].str.replace(r'^', '', regex=True, flags=re.IGNORECASE)
+    df.Strasse = df.Strasse.str.title()
 
 
 deleteZusatzColumns()
 formattierung_Anrede()
 formattierung_Titel()
 formattierung_Vorname()
+formattierung_Nachname()
+formattierung_Geburtsdatum()
+formattierung_Strasse_Hausnummer()
 
 
 
 def formattierung_validator():
-    special_chars = 'è|È|é|É|ê|Ê|ã|Ã|ř|Ř|ç|Ç|Æ|æ|Ø|ø|Å|å|í|Í'
-
 
     #Zusatz-Columns
     errors_columnsToIgnore = []
@@ -68,16 +154,32 @@ def formattierung_validator():
         print(b.OKGREEN+'✔  "Titel" is Formatted correctly'+b.ENDC)
     else:
         print(b.FAIL+'✘  "Titel" is  not Formatted correctly'+b.ENDC)
-
+    
     #Vorname
     if df.Vorname.str.istitle().all() == True:
         print(b.OKGREEN+'✔  "Vorname" is Formatted correctly'+b.ENDC)
     else:
         print(b.FAIL+'✘  "Vorname" is  not Formatted correctly'+b.ENDC)
+    
+    #Nachname
+    if df.Nachname.str.istitle().all() == True:
+        print(b.OKGREEN+'✔  "Nachname" is Formatted correctly'+b.ENDC)
+    else:
+        print(b.FAIL+'✘  "Nachname" is  not Formatted correctly'+b.ENDC)
 
-    # I HAVE BEEN STUCK ON THIS PART FOR AN HOUR I CANT ANYMORE PLEASE SEND HELP. 🤓"pandas.errors.IndexingError: Unalignable boolean Series provided as indexer (index of the boolean Series and of the indexed object do not match)"🤓
-    #contains_special_chars = df[df.Titel.str.contains(special_chars)]
-    #print (contains_special_chars)
+    #Geburtsdatum
+    #if df['Geburtsdatum'].dt.date:
+        #print(b.OKGREEN+'✔  "Geburtsdatum" is Formatted correctly'+b.ENDC)
+    #else:
+        #print(b.FAIL+'✘  "Geburtsdatum" is  not Formatted correctly'+b.ENDC)
+
+    #Strasse
+    if not df['Strasse'].str.contains(r'\d', regex=True).any():
+        print(b.OKGREEN+'✔  "Strasse" is Formatted correctly'+b.ENDC)
+    else:
+        print(b.FAIL+'✘  "Strasse" is  not Formatted correctly'+b.ENDC)
+
+    
 
 
 formattierung_validator()
