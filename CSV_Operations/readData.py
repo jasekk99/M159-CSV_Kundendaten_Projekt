@@ -100,22 +100,22 @@ def formattierung_Geburtsdatum():
     matched_dates = df[df['Geburtsdatum'].str.match(date_pattern)]
 
 def formattierung_Strasse_Hausnummer():
-    hausnummer_liste = []
-    number_pattern = r'\d+'
-
-    for text in df['Strasse']:
-        numbers = re.findall(number_pattern, text)
-        hausnummer_liste.extend(numbers)
-    
+    df['Strasse'] = df['Strasse'].str.replace(r'ß', 'ss', regex=True, flags=re.IGNORECASE)
+    df['Strasse'] = df['Strasse'].str.replace(r'^', '', regex=True, flags=re.IGNORECASE)
+    df.Strasse = df.Strasse.str.title()
     df['Hausnummer'].fillna(df['Strasse'], inplace=True)
     df['Strasse'] = df['Strasse'].str.replace('\d+', '', regex=True)
     df['Strasse'] = df['Strasse'].str.replace('\s[a-z].* [a-z]\s', '', regex=True)
     df.at[70, 'Strasse'] = "In der Sengenau"
     df.at[1520, 'Strasse'] = "Marellenkämpe"
     df.at[1689, 'Strasse'] = "Lerchensteg"
-    df['Strasse'] = df['Strasse'].str.replace(r'ß', 'ss', regex=True, flags=re.IGNORECASE)
-    df['Strasse'] = df['Strasse'].str.replace(r'^', '', regex=True, flags=re.IGNORECASE)
-    df.Strasse = df.Strasse.str.title()
+
+
+def formattierung_PLZ_Stadt():
+    df.Stadt = df.Stadt.str.title()
+    df['Postleitzahl'].fillna(df['Stadt'], inplace=True)
+    df['Postleitzahl'] = df['Postleitzahl'].str.replace('[^0-9]', '', regex=True)
+    df['Stadt'] = df['Stadt'].str.replace('\d', '', regex=True)
 
 
 deleteZusatzColumns()
@@ -125,6 +125,7 @@ formattierung_Vorname()
 formattierung_Nachname()
 formattierung_Geburtsdatum()
 formattierung_Strasse_Hausnummer()
+formattierung_PLZ_Stadt()
 
 
 
