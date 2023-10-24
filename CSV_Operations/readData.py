@@ -1,11 +1,11 @@
 import pandas as pd
-import time
+from time import sleep
 import bcolors as b
 import string
 import re
 from datetime import datetime
 import numpy as np
-
+from alive_progress import alive_bar
 
 df = pd.read_csv('../CSV/export_Kunden_DE_E.csv', encoding = "utf-8", delimiter=";", encoding_errors='ignore')
 
@@ -104,11 +104,15 @@ def formattierung_Strasse_Hausnummer():
     df['Strasse'] = df['Strasse'].str.replace(r'^', '', regex=True, flags=re.IGNORECASE)
     df.Strasse = df.Strasse.str.title()
     df['Hausnummer'].fillna(df['Strasse'], inplace=True)
+    df['Strasse'] = df['Strasse'].str.replace('(?<=\d\s)[a-zA-Z]', '', regex=True)
     df['Strasse'] = df['Strasse'].str.replace('\d+', '', regex=True)
     df['Strasse'] = df['Strasse'].str.replace('\s[a-z].* [a-z]\s', '', regex=True)
-    df.at[70, 'Strasse'] = "In der Sengenau"
-    df.at[1520, 'Strasse'] = "Marellenkämpe"
-    df.at[1689, 'Strasse'] = "Lerchensteg"
+    df['Hausnummer'] = df['Hausnummer'].str.replace('[a-zA-ZÄÖÜäöüß.-]+(?=\D*\d)', '', regex=True)
+    df['Hausnummer'] = df['Hausnummer'].str.replace(' ', '', regex=True)
+    df['Hausnummer'] = df['Hausnummer'].str.upper()
+    #df.at['70', 'Strasse'] = "In der Sengenau"
+    #df.at['1520', 'Strasse'] = "Marellenkämpe"
+    #df.at['1689', 'Strasse'] = "Lerchensteg"
 
 
 def formattierung_PLZ_Stadt():
@@ -118,14 +122,46 @@ def formattierung_PLZ_Stadt():
     df['Stadt'] = df['Stadt'].str.replace('\d', '', regex=True)
 
 
-deleteZusatzColumns()
-formattierung_Anrede()
-formattierung_Titel()
-formattierung_Vorname()
-formattierung_Nachname()
-formattierung_Geburtsdatum()
-formattierung_Strasse_Hausnummer()
-formattierung_PLZ_Stadt()
+# Function to standardize phone numbers
+def formattierung_Telefon(number):
+    # Convert the float to a string
+    number_str = str(number)
+    
+    # Remove all non-digit characters
+    number_str = re.sub(r'\D', '', number_str)
+
+    # Check if the number starts with "0" and add "+49" if it does
+    if number_str.startswith('0'):
+        number_str = "+49" + number_str[1:]
+
+    # Add spaces for a consistent format
+    df['Telefon'] = df['Telefon'].str.replace('^(?!.*\+).*$', '+', regex=True)
+    formatted_number = re.sub(r'(\d{4})(\d+)', r'\1 \2', number_str)
+    
+
+    return formatted_number
+
+
+print()
+with alive_bar(9, title='Bereinige CSV...', length=70) as bar:
+    deleteZusatzColumns()
+    bar()
+    formattierung_Anrede()
+    bar()
+    formattierung_Titel()
+    bar()
+    formattierung_Vorname()
+    bar()
+    formattierung_Nachname()
+    bar()
+    formattierung_Geburtsdatum()
+    bar()
+    formattierung_Strasse_Hausnummer()
+    bar()
+    formattierung_PLZ_Stadt()
+    bar()
+    df['Telefon'] = df['Telefon'].apply(formattierung_Telefon)
+    bar()
 
 
 
