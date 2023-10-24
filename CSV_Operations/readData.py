@@ -117,6 +117,8 @@ def formattierung_PLZ_Stadt():
     df['Postleitzahl'] = df['Postleitzahl'].str.replace('[^0-9]', '', regex=True)
     df['Stadt'] = df['Stadt'].str.replace('\d', '', regex=True)
     df['Stadt'] = df['Stadt'].str.replace('^\s', '', regex=True)
+    df['Stadt'] = df['Stadt'].str.replace(r'\bFeuersche\$D\b', 'Feuerscheid', regex=True)
+    df['Stadt'] = df['Stadt'].str.replace(r'\bHeubaH\b', 'Heubach', regex=True)
 
 def formattierung_Telefon(number):
     # Convert the float to a string
@@ -187,8 +189,44 @@ def formattierung_Firma():
     df['Firma'] = df['Firma'].str.replace(r'\bKgaa\b','KGaA', regex=True)
     df['Firma'] = df['Firma'].str.replace(r'\bGmbh\b','GmbH', regex=True)
 
+def formattierung_Bundesland():
+    df['Bundesland'] = df['Bundesland'].str.replace(r'\bNieersachsen\b', 'Niedersachsen', regex=True)
+    df['Bundesland'] = df['Bundesland'].str.replace(r'\bNiXdersachsen\b', 'Niedersachsen', regex=True)
+    df['Bundesland'] = df['Bundesland'].str.replace(r'\bNordrhein-sestfalen\b', 'Nordrhein-Westfalen', regex=True)
+    df['Bundesland'] = df['Bundesland'].str.replace(r'\bRandenburg\b', 'Brandenburg', regex=True)
+    df['Bundesland'] = df['Bundesland'].str.replace(r'\bRheinland-Palz\b', 'Rheinland-Pfalz', regex=True)
+    df['Bundesland'] = df['Bundesland'].str.replace(r'\bRheinand-Pfalz\b', 'Rheinland-Pfalz', regex=True)
+    df['Bundesland'] = df['Bundesland'].str.replace(r'\bRheinland-Pfaz\b', 'Rheinland-Pfalz', regex=True)
+    df['Bundesland'] = df['Bundesland'].str.replace(r'\bRheinland-Pfjlz\b', 'Rheinland-Pfalz', regex=True)
+    df['Bundesland'] = df['Bundesland'].str.replace(r'\bRheinlnd-Pfalz\b', 'Rheinland-Pfalz', regex=True)
+    df['Bundesland'] = df['Bundesland'].str.replace(r'\bSchleswig-Holtein\b', 'Schleswig-Holstein', regex=True)
 
-with alive_bar(12, title='Bereinige CSV...', length=70) as bar:
+def formattierung_Fax(number):
+    # Convert the float to a string
+    number_str = str(number)
+    
+    # Remove all non-digit characters
+    number_str = re.sub(r'[^+\d]', '', number_str)
+
+    # Check if the number starts with "0" and add "+49" if it does
+    if number_str.startswith('0'):
+        number_str = "+49" + number_str[1:]
+
+    # Add spaces for a consistent format
+    formatted_number = re.sub(r'(\d{4})(\d+)', r'\1 \2', number_str)
+    
+
+    return formatted_number
+
+def formattierung_Aktiv():
+    df['Aktiv'] = df['Aktiv'].str.lower()
+    df['Aktiv'] = df['Aktiv'].str.replace(r'ja', 'True')
+    df['Aktiv'] = df['Aktiv'].str.replace(r'nein', 'False')
+
+
+
+
+with alive_bar(15, title='Bereinige CSV...', length=70) as bar:
     deleteZusatzColumns()
     bar()
     formattierung_Anrede()
@@ -207,12 +245,17 @@ with alive_bar(12, title='Bereinige CSV...', length=70) as bar:
     bar()
     df['Telefon'] = df['Telefon'].apply(formattierung_Telefon)
     bar()
-    #df['Mobil'] = df['Mobil'].str.replace('/\([^\d\n]*0[^\d\n]*\)/', '', regex=True)
     df['Mobil'] = df['Mobil'].apply(formattierung_Mobil)
     bar()
     formattierung_Email()
     bar()
     formattierung_Firma()
+    bar()
+    formattierung_Bundesland()
+    bar()
+    df['Fax'] = df['Fax'].apply(formattierung_Fax)
+    bar()
+    formattierung_Aktiv()
     bar()
 
 
