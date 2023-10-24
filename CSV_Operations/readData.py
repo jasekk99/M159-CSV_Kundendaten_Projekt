@@ -116,6 +116,7 @@ def formattierung_PLZ_Stadt():
     df['Postleitzahl'].fillna(df['Stadt'], inplace=True)
     df['Postleitzahl'] = df['Postleitzahl'].str.replace('[^0-9]', '', regex=True)
     df['Stadt'] = df['Stadt'].str.replace('\d', '', regex=True)
+    df['Stadt'] = df['Stadt'].str.replace('^\s', '', regex=True)
 
 def formattierung_Telefon(number):
     # Convert the float to a string
@@ -129,8 +130,8 @@ def formattierung_Telefon(number):
         number_str = "+49" + number_str[1:]
 
     # Add spaces for a consistent format
-    df['Mobil'] = df['Mobil'].str.replace('/\([^\d\n]*0[^\d\n]*\)/', '', regex=True)
-    df['Telefon'] = df['Telefon'].str.replace('^(?!.*\+).*$', '+', regex=True)
+    #df['Mobil'] = df['Mobil'].str.replace('/\([^\d\n]*0[^\d\n]*\)/', '', regex=True)
+    #df['Telefon'] = df['Telefon'].str.replace('^(?!.*\+).*$', '+', regex=True)
     formatted_number = re.sub(r'(\d{4})(\d+)', r'\1 \2', number_str)
     
 
@@ -155,10 +156,39 @@ def formattierung_Mobil(number):
 
     return formatted_number
 
+def formattierung_Email():
+    df.EMail = df.EMail.str.lower()
+    df['EMail'] = df['EMail'].str.replace(r'è', 'e', regex=True, flags=re.IGNORECASE)
+    df['EMail'] = df['EMail'].str.replace(r'é', 'e', regex=True, flags=re.IGNORECASE)
+    df['EMail'] = df['EMail'].str.replace(r'ê', 'e', regex=True, flags=re.IGNORECASE)
+    df['EMail'] = df['EMail'].str.replace(r'ã', 'a', regex=True, flags=re.IGNORECASE)
+    df['EMail'] = df['EMail'].str.replace(r'ř', 'r', regex=True, flags=re.IGNORECASE)
+    df['EMail'] = df['EMail'].str.replace(r'ç', 'c', regex=True, flags=re.IGNORECASE)
+    df['EMail'] = df['EMail'].str.replace(r'æ', 'ae', regex=True, flags=re.IGNORECASE)
+    df['EMail'] = df['EMail'].str.replace(r'ø', 'o', regex=True, flags=re.IGNORECASE)
+    df['EMail'] = df['EMail'].str.replace(r'å', 'a', regex=True, flags=re.IGNORECASE)
+    df['EMail'] = df['EMail'].str.replace(r'í', 'i', regex=True, flags=re.IGNORECASE)
+    df['EMail'] = df['EMail'].str.replace(r'ú', 'u', regex=True, flags=re.IGNORECASE)
+    df['EMail'] = df['EMail'].str.replace(r'ù', 'u', regex=True, flags=re.IGNORECASE)
+    df['EMail'] = df['EMail'].str.replace(r'û', 'u', regex=True, flags=re.IGNORECASE)
+    df['EMail'] = df['EMail'].str.replace(r'ğ', 'g', regex=True, flags=re.IGNORECASE)
+    df['EMail'] = df['EMail'].str.replace(r'ä', 'a', regex=True, flags=re.IGNORECASE)
+    df['EMail'] = df['EMail'].str.replace(r'ö', 'o', regex=True, flags=re.IGNORECASE)
+    df['EMail'] = df['EMail'].str.replace(r'ü', 'u', regex=True, flags=re.IGNORECASE)
+    df['EMail'] = df['EMail'].str.replace(r'ß', 'ss', regex=True, flags=re.IGNORECASE)
+
+def formattierung_Firma():
+    df['Firma'] = df['Firma'].str.title()
+    df['Firma'] = df['Firma'].str.replace(r'\bAg\b','AG', regex=True)
+    df['Firma'] = df['Firma'].str.replace(r'\bKg\b','KG', regex=True)
+    df['Firma'] = df['Firma'].str.replace(r'\bOhg\b','OHG', regex=True)
+    df['Firma'] = df['Firma'].str.replace(r'\bUg\b','UG', regex=True)
+    df['Firma'] = df['Firma'].str.replace(r'\bGbr\b','GbR', regex=True)
+    df['Firma'] = df['Firma'].str.replace(r'\bKgaa\b','KGaA', regex=True)
+    df['Firma'] = df['Firma'].str.replace(r'\bGmbh\b','GmbH', regex=True)
 
 
-print()
-with alive_bar(10, title='Bereinige CSV...', length=70) as bar:
+with alive_bar(12, title='Bereinige CSV...', length=70) as bar:
     deleteZusatzColumns()
     bar()
     formattierung_Anrede()
@@ -177,7 +207,12 @@ with alive_bar(10, title='Bereinige CSV...', length=70) as bar:
     bar()
     df['Telefon'] = df['Telefon'].apply(formattierung_Telefon)
     bar()
+    #df['Mobil'] = df['Mobil'].str.replace('/\([^\d\n]*0[^\d\n]*\)/', '', regex=True)
     df['Mobil'] = df['Mobil'].apply(formattierung_Mobil)
+    bar()
+    formattierung_Email()
+    bar()
+    formattierung_Firma()
     bar()
 
 
