@@ -110,10 +110,6 @@ def formattierung_Strasse_Hausnummer():
     df['Hausnummer'] = df['Hausnummer'].str.replace('[a-zA-ZÄÖÜäöüß.-]+(?=\D*\d)', '', regex=True)
     df['Hausnummer'] = df['Hausnummer'].str.replace(' ', '', regex=True)
     df['Hausnummer'] = df['Hausnummer'].str.upper()
-    #df.at['70', 'Strasse'] = "In der Sengenau"
-    #df.at['1520', 'Strasse'] = "Marellenkämpe"
-    #df.at['1689', 'Strasse'] = "Lerchensteg"
-
 
 def formattierung_PLZ_Stadt():
     df.Stadt = df.Stadt.str.title()
@@ -121,29 +117,48 @@ def formattierung_PLZ_Stadt():
     df['Postleitzahl'] = df['Postleitzahl'].str.replace('[^0-9]', '', regex=True)
     df['Stadt'] = df['Stadt'].str.replace('\d', '', regex=True)
 
-
-# Function to standardize phone numbers
 def formattierung_Telefon(number):
     # Convert the float to a string
     number_str = str(number)
     
     # Remove all non-digit characters
-    number_str = re.sub(r'\D', '', number_str)
+    number_str = re.sub(r'[^+\d]', '', number_str)
 
     # Check if the number starts with "0" and add "+49" if it does
     if number_str.startswith('0'):
         number_str = "+49" + number_str[1:]
 
     # Add spaces for a consistent format
+    df['Mobil'] = df['Mobil'].str.replace('/\([^\d\n]*0[^\d\n]*\)/', '', regex=True)
     df['Telefon'] = df['Telefon'].str.replace('^(?!.*\+).*$', '+', regex=True)
     formatted_number = re.sub(r'(\d{4})(\d+)', r'\1 \2', number_str)
     
 
     return formatted_number
 
+def formattierung_Mobil(number):
+    # Convert the float to a string
+    number_str = str(number)
+    
+    # Remove all non-digit characters
+    number_str = re.sub(r'[^+\d]', '', number_str)
+
+    # Check if the number starts with "0" and add "+49" if it does
+    if number_str.startswith('0'):
+        number_str = "+49" + number_str[1:]
+
+    # Add spaces for a consistent format
+    #df['Mobil'] = df['Mobil'].str.replace('/\([^\d\n]*0[^\d\n]*\)/', '', regex=True)
+    
+    formatted_number = re.sub(r'(\d{4})(\d+)', r'\1 \2', number_str)
+    
+
+    return formatted_number
+
+
 
 print()
-with alive_bar(9, title='Bereinige CSV...', length=70) as bar:
+with alive_bar(10, title='Bereinige CSV...', length=70) as bar:
     deleteZusatzColumns()
     bar()
     formattierung_Anrede()
@@ -161,6 +176,8 @@ with alive_bar(9, title='Bereinige CSV...', length=70) as bar:
     formattierung_PLZ_Stadt()
     bar()
     df['Telefon'] = df['Telefon'].apply(formattierung_Telefon)
+    bar()
+    df['Mobil'] = df['Mobil'].apply(formattierung_Mobil)
     bar()
 
 
