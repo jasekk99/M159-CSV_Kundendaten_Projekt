@@ -1,13 +1,11 @@
+import subprocess, sys, string, re, random, secrets
 import pandas as pd
 from time import sleep
 import bcolors as b
-import string
-import re
 from datetime import datetime
 import numpy as np
 from alive_progress import alive_bar
-import random
-import secrets
+
 
 df = pd.read_csv('../CSV/export_Kunden_DE_E.csv', encoding = "utf-8", delimiter=";", encoding_errors='ignore')
 
@@ -197,13 +195,34 @@ def formattierung_Bundesland():
     df['Bundesland'] = df['Bundesland'].str.replace(r'\bNieersachsen\b', 'Niedersachsen', regex=True)
     df['Bundesland'] = df['Bundesland'].str.replace(r'\bNiXdersachsen\b', 'Niedersachsen', regex=True)
     df['Bundesland'] = df['Bundesland'].str.replace(r'\bNordrhein-sestfalen\b', 'Nordrhein-Westfalen', regex=True)
+    df['Bundesland'] = df['Bundesland'].str.replace(r'\bNordrhein-Westfaln\b', 'Nordrhein-Westfalen', regex=True)
     df['Bundesland'] = df['Bundesland'].str.replace(r'\bRandenburg\b', 'Brandenburg', regex=True)
+    df['Bundesland'] = df['Bundesland'].str.replace(r'\brandenburg\b', 'Brandenburg', regex=True)
     df['Bundesland'] = df['Bundesland'].str.replace(r'\bRheinland-Palz\b', 'Rheinland-Pfalz', regex=True)
     df['Bundesland'] = df['Bundesland'].str.replace(r'\bRheinand-Pfalz\b', 'Rheinland-Pfalz', regex=True)
     df['Bundesland'] = df['Bundesland'].str.replace(r'\bRheinland-Pfaz\b', 'Rheinland-Pfalz', regex=True)
     df['Bundesland'] = df['Bundesland'].str.replace(r'\bRheinland-Pfjlz\b', 'Rheinland-Pfalz', regex=True)
     df['Bundesland'] = df['Bundesland'].str.replace(r'\bRheinlnd-Pfalz\b', 'Rheinland-Pfalz', regex=True)
     df['Bundesland'] = df['Bundesland'].str.replace(r'\bSchleswig-Holtein\b', 'Schleswig-Holstein', regex=True)
+    df['Bundesland'] = df['Bundesland'].str.replace(r'\bayern\b', 'Bayern', regex=True)
+    df['Bundesland'] = df['Bundesland'].str.replace(r'è', 'e', regex=True, flags=re.IGNORECASE)
+    df['Bundesland'] = df['Bundesland'].str.replace(r'é', 'e', regex=True, flags=re.IGNORECASE)
+    df['Bundesland'] = df['Bundesland'].str.replace(r'ê', 'e', regex=True, flags=re.IGNORECASE)
+    df['Bundesland'] = df['Bundesland'].str.replace(r'ã', 'a', regex=True, flags=re.IGNORECASE)
+    df['Bundesland'] = df['Bundesland'].str.replace(r'ř', 'r', regex=True, flags=re.IGNORECASE)
+    df['Bundesland'] = df['Bundesland'].str.replace(r'ç', 'c', regex=True, flags=re.IGNORECASE)
+    df['Bundesland'] = df['Bundesland'].str.replace(r'æ', 'ae', regex=True, flags=re.IGNORECASE)
+    df['Bundesland'] = df['Bundesland'].str.replace(r'ø', 'o', regex=True, flags=re.IGNORECASE)
+    df['Bundesland'] = df['Bundesland'].str.replace(r'å', 'a', regex=True, flags=re.IGNORECASE)
+    df['Bundesland'] = df['Bundesland'].str.replace(r'í', 'i', regex=True, flags=re.IGNORECASE)
+    df['Bundesland'] = df['Bundesland'].str.replace(r'ú', 'u', regex=True, flags=re.IGNORECASE)
+    df['Bundesland'] = df['Bundesland'].str.replace(r'ù', 'u', regex=True, flags=re.IGNORECASE)
+    df['Bundesland'] = df['Bundesland'].str.replace(r'û', 'u', regex=True, flags=re.IGNORECASE)
+    df['Bundesland'] = df['Bundesland'].str.replace(r'ğ', 'g', regex=True, flags=re.IGNORECASE)
+    df['Bundesland'] = df['Bundesland'].str.replace(r'ä', 'ae', regex=True, flags=re.IGNORECASE)
+    df['Bundesland'] = df['Bundesland'].str.replace(r'ö', 'oe', regex=True, flags=re.IGNORECASE)
+    df['Bundesland'] = df['Bundesland'].str.replace(r'ü', 'ue', regex=True, flags=re.IGNORECASE)
+    df['Bundesland'] = df['Bundesland'].str.replace(r'ß', 'ss', regex=True, flags=re.IGNORECASE)
 
 def formattierung_Fax(number):
     # Convert the float to a string
@@ -324,7 +343,7 @@ formattierung_validator()
 
 
 #Detailed/Readable version
-df.to_csv('../CSV/Formattiert_export_Kunden_DE_E.csv', sep=';', index=False, encoding='utf-8')
+#df.to_csv('../CSV/Formattiert_export_Kunden_DE_E.csv', sep=';', index=False, encoding='utf-8')
  
 
 
@@ -351,13 +370,22 @@ for a in range(len(df)):
         pwd += ''.join(secrets.choice(pw_alphabet))
     pw_list.append(pwd)
 
-
 #print(pw_list)
 
 df['password'] = pw_list
 
 
+uniqueBundeslaender = str(df['Bundesland'].unique())
 
+test1 ='test SUCCESSFULLLLLL LESGOOOO'
+script = 'C:\Software-Dev-Env\GitHub\main\M159-CSV_Kundendaten_Projekt\AD_Operations\ADVorbereitung.ps1'
+p = subprocess.run([
+            "powershell.exe", 
+            "-File", 
+            script,
+            uniqueBundeslaender
+          ],
+          stdout=sys.stdout)
 
 
 
