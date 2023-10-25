@@ -6,6 +6,8 @@ import re
 from datetime import datetime
 import numpy as np
 from alive_progress import alive_bar
+import random
+import secrets
 
 df = pd.read_csv('../CSV/export_Kunden_DE_E.csv', encoding = "utf-8", delimiter=";", encoding_errors='ignore')
 
@@ -71,6 +73,8 @@ def formattierung_Nachname():
     df['Nachname'] = df['Nachname'].str.replace(r'ö', 'oe', regex=True, flags=re.IGNORECASE)
     df['Nachname'] = df['Nachname'].str.replace(r'ü', 'ue', regex=True, flags=re.IGNORECASE)
     df['Nachname'] = df['Nachname'].str.replace(r'ß', 'ss', regex=True, flags=re.IGNORECASE)
+    df['Titel'] = df['Nachname'].str.extract(r'(Dr\.)')
+    df['Nachname'] = df['Nachname'].str.replace(r'(\bDr\.\s+\b)', '', regex=True)
     df.Nachname = df.Nachname.str.title()
 
 def formattierung_Geburtsdatum():
@@ -317,5 +321,47 @@ def formattierung_validator():
 formattierung_validator()
 
 
+
+
+#Detailed/Readable version
+df.to_csv('../CSV/Formattiert_export_Kunden_DE_E.csv', sep=';', index=False, encoding='utf-8')
+ 
+
+
+#Preparation for AD Import [Reformatting column names+other adjustments
+#df.rename(columns={'Vorname':'firstname', 'Nachname':'lastname'})
+df['username'] = (df['Vorname'].str[0]+df['Nachname'].str[0:])
+df['username'] = df['username'].str.lower()
+
+mask = df['username'].duplicated(keep=False)
+df.loc[mask, 'username'] += df.groupby('username').cumcount().add(1).astype(str)
+
+
+
+pw_letters = string.ascii_letters
+pw_digits = string.digits
+#pw_special_chars = string.punctuation
+pw_alphabet = pw_letters + pw_digits #+ pw_special_chars
+pwd_length = 10
+pwd = ''
+pw_list = []
+for a in range(len(df)):
+    pwd=''
+    for i in range(pwd_length):
+        pwd += ''.join(secrets.choice(pw_alphabet))
+    pw_list.append(pwd)
+
+
+#print(pw_list)
+
+df['password'] = pw_list
+
+
+
+
+
+
+
+
+#AD Import Version (Not intended to be opened and used for references)
 df.to_csv('../CSV/output.csv', sep=';', index=False, encoding='utf-8')
-#print(df.head(100))
