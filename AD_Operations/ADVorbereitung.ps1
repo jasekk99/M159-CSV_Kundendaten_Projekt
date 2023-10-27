@@ -1,3 +1,8 @@
+
+
+
+
+
 param (
     [Parameter()]
     [array]$uniqueBundeslaender
@@ -11,21 +16,25 @@ $NewOUPath = ''
 
 function AddOU {
     param (
-        [Parameter()]
-        [string]$NewOUName,
+            [Parameter()]
+            [string]$NewOUName,
 
-        [Parameter()]
-        [string]$NewOUPath
-    )
-
-    Invoke-Command -ComputerName sr-dc01 -Scriptblock {
-        param (
-            $NewOUName,
-            $NewOUPath
+            [Parameter()]
+            [string]$NewOUPath
         )
+    
+        
 
-        New-ADOrganizationalUnit -Name $NewOUName -Path $NewOUPath
-    } -Credential $cred -ArgumentList $NewOUName, $NewOUPath
+        Invoke-Command -ComputerName sr-dc01 -Scriptblock {
+            param (
+                $NewOUName,
+                $NewOUPath
+            )
+
+            New-ADOrganizationalUnit -Name $NewOUName -Path $NewOUPath
+        } -Credential $cred -ArgumentList $NewOUName, $NewOUPath
+    
+    
 }
 
 function DisableDeletePrevention {
@@ -33,6 +42,7 @@ function DisableDeletePrevention {
         [Parameter()]
         [string]$search_DeletePrev
     )
+    
     Invoke-Command -ComputerName sr-dc01 -Scriptblock {
         param (
             $search_DeletePrev
@@ -40,6 +50,7 @@ function DisableDeletePrevention {
 
         Get-ADObject -Filter * -SearchBase $search_DeletePrev |ForEach-Object -Process {Set-ADObject -ProtectedFromAccidentalDeletion $false -Identity $_}
     } -Credential $cred -ArgumentList $search_DeletePrev
+
 }
 
 
