@@ -361,7 +361,7 @@ pw_letters = string.ascii_letters
 pw_digits = string.digits
 #pw_special_chars = string.punctuation
 pw_alphabet = pw_letters + pw_digits #+ pw_special_chars
-pwd_length = 10
+pwd_length = 12
 pwd = ''
 pw_list = []
 for a in range(len(df)):
@@ -374,18 +374,8 @@ for a in range(len(df)):
 
 df['password'] = pw_list
 
-
-uniqueBundeslaender = str(df['Bundesland'].unique())
-
-test1 ='test SUCCESSFULLLLLL LESGOOOO'
-script = 'C:\Software-Dev-Env\GitHub\main\M159-CSV_Kundendaten_Projekt\AD_Operations\ADVorbereitung.ps1'
-p = subprocess.run([
-            "powershell.exe", 
-            "-File", 
-            script,
-            uniqueBundeslaender
-          ],
-          stdout=sys.stdout)
+df['User principal name'] = df['username']+"@intersped.loc"
+df['OU'] = "OU="+df['Bundesland']+",OU=Kunden,DC=intersped,DC=loc"
 
 
 
@@ -393,3 +383,14 @@ p = subprocess.run([
 
 #AD Import Version (Not intended to be opened and used for references)
 df.to_csv('../CSV/output.csv', sep=';', index=False, encoding='utf-8')
+
+
+
+test1 ='test SUCCESSFULLLLLL LESGOOOO'
+script = 'C:\Software-Dev-Env\GitHub\main\M159-CSV_Kundendaten_Projekt\AD_Operations\ADVorbereitung.ps1'
+p = subprocess.run([
+            "powershell.exe", 
+            "-File", 
+            script
+          ],
+          stdout=sys.stdout)
